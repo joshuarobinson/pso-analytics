@@ -8,19 +8,19 @@ PSO-analytics is a deployment that periodically correlates storage usage and dat
 * labels
 * namespaces
 
-To install:
+To install in the 'pso-analytics' namespace:
 ```
 kubectl apply -f https://raw.githubusercontent.com/joshuarobinson/pso-analytics/master/pso-analytics.yaml
 ```
 
+Download and modify the yaml to change the namespace or periodicity of output.
+
 To view the output:
 ```
-kubectl logs -f deployment.apps/pso-analytics
+kubectl logs -f -n=pso-analytics deployment.apps/pso-analytics
 ```
 
 Limitations:
-* Overly invasive privileges granted (all secrets visible)
-* Installs in the default namespace
 * Output is rigid and not easy to parse, query, or visualize
 * Many other interesting aggregations and top 10s missing
 * Performance information not included

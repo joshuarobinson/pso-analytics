@@ -1,8 +1,14 @@
 ---
 apiVersion: v1
+kind: Namespace
+metadata:
+  name: pso-analytics
+---
+apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: pso-collect
+  namespace: pso-analytics
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -17,11 +23,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: pso-collect
-  namespace: default
+  namespace: pso-analytics
 subjects:
 - kind: ServiceAccount
   name: pso-collect
-  namespace: default
+  namespace: pso-analytics
 roleRef:
   kind: ClusterRole
   name: pso-collect
@@ -31,6 +37,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: pso-collect-secret
+  namespace: pso-analytics
 rules:
 - apiGroups: [""]
   resources: ["secrets"]
@@ -40,11 +47,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: pso-collect-secret
-  namespace: default
+  namespace: pso-analytics
 subjects:
 - kind: ServiceAccount
   name: pso-collect
-  namespace: default
+  namespace: pso-analytics
 roleRef:
   kind: ClusterRole
   name: pso-collect-secret
@@ -54,6 +61,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: pso-analytics
+  namespace: pso-analytics
 spec:
   replicas: 1
   selector:
