@@ -207,7 +207,7 @@ if args.output == 'table':
                           "volume_count": 1}
                 thistab[key] = sum_volume_records(thistab[key], newrow) if key in thistab else copy.copy(newrow)
 
-        # Flatten to a list and put the "name" back into to the dict. For tabulate
+        # Flatten to a list and put the "name" back into to the dict (for tabulate)
         finaltab = [{"name": k, **prettify_record(thistab[k])} for k in thistab.keys()]
         print(tabulate.tabulate(finaltab, headers="keys"))
 

@@ -75,7 +75,7 @@ spec:
       serviceAccountName: pso-collect
       containers:
       - name: collect
-        image: joshuarobinson/pso-analytics:0.1
+        image: quay.io/purestorage/pso-analytics:0.1
         command: ["/bin/sh"]
         args: ["-c", "while true; do yes '' | sed 5q; date; python collect_storage_info.py; sleep 3600; done"]
         imagePullPolicy: Always
