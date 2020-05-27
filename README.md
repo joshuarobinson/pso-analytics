@@ -1,5 +1,6 @@
 # pso-analytics
 
+Storage analytics for Kubernetes: for a detailed description see my [accompanying blog post](https://medium.com/@joshua_robinson/pso-analytics-visibility-into-how-kubernetes-applications-use-storage-e7bda52c3bf).
 
 ## Problem Statement
 
