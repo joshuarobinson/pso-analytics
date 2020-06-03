@@ -3,6 +3,9 @@ import purestorage
 import purity_fb
 import tabulate
 
+import prometheus_client
+import prometheus_client.core
+
 import argparse
 import base64
 import copy
@@ -12,6 +15,8 @@ import re
 import time
 import urllib3
 
+# Constants
+PROMETHEUS_PORT=9492
 
 # Helper to output byte values in human readable format.
 def as_human_readable(input_bytes):
@@ -44,7 +49,6 @@ def prettify_record(r):
     return newr
 
 
-
 ###############################################################################
 
 parser = argparse.ArgumentParser()
@@ -53,7 +57,9 @@ parser.add_argument('--output', choices=['table', 'json'],
                     default='table',
                     help='Output format.')
 parser.add_argument('--poll-seconds', default=3600, type=int, help='Frequency to poll stats')
+parser.add_argument('--prometheus', action='store_true', help='Enable Prometheus endpoint')
 args = parser.parse_args()
+
 
 def collect_volumes():
     #========= Login to Kubernetes cluster ======================
@@ -194,7 +200,42 @@ def collect_volumes():
 
     return vols
 
-#========= Print out Results ======================
+
+def prom_data_model(label):
+    # Modify labels to conform to the Prometheus data model.
+    return label.replace("-", "_").replace("/", "_")
+
+
+class CustomCollector(object):
+    def collect(self):
+        # Collect pso-analytics information.
+        vols = collect_volumes()
+        # Extra labels from the set of tags.
+        labellist = list(set([prom_data_model(y) for x in
+            [list(v["tags"].keys()) for v in vols] for y in x if y != "all"]))
+
+        g_used = prometheus_client.core.GaugeMetricFamily('pso_volume_used_bytes',
+                'Logical byte usage by volumes', labels=['uid'] + labellist)
+        g_phys = prometheus_client.core.GaugeMetricFamily('pso_volume_physical_bytes',
+                'Physical byte usage by volumes', labels=['uid'] + labellist)
+        g_prov = prometheus_client.core.GaugeMetricFamily('pso_volume_provisioned_bytes',
+                'Bytes provisioned for volumes', labels=['uid'] + labellist)
+
+        for v in vols:
+            labelvalues = [v['uid']] + [v['tags'][t] if t in v['tags'] else '<none>' for t in labellist]
+            g_used.add_metric(labelvalues, v['logical_bytes'])
+            g_phys.add_metric(labelvalues, int(v['physical_bytes']))
+            g_prov.add_metric(labelvalues, v['provisioned_bytes'])
+        yield g_used
+        yield g_phys
+        yield g_prov
+
+
+#========= Main Entry Point ======================
+
+if args.prometheus:
+    prometheus_client.REGISTRY.register(CustomCollector())
+    prometheus_client.start_http_server(PROMETHEUS_PORT)
 
 while True:
     vols = collect_volumes()

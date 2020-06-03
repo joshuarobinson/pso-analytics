@@ -77,6 +77,21 @@ spec:
       - name: collect
         image: joshuarobinson/pso-analytics:0.2
         command: ["python"]
-        args: ["collect_storage_info.py", "--poll-seconds", "3600"]
+        args: ["collect_storage_info.py", "--prometheus", "--poll-seconds", "3600", "--output", "table"]
         imagePullPolicy: Always
       restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pso-analytics
+  namespace: pso-analytics
+  labels:
+    app: pso-analytics
+spec:
+  clusterIP: None
+  ports:
+  - name: pso-analytics-port
+    port: 9492
+  selector:
+    app: pso-collect

@@ -42,6 +42,18 @@ To view the output:
 kubectl logs -n=pso-analytics deployment.apps/pso-analytics
 ```
 
+## PSO-analytics v0.2
+
+Added support for a Prometheus endpoint via the command line flag '--prometheus' on port 9492.
+
+Configure Prometheus to scrape pso-analytics as follows:
+```
+    scrape_configs:
+      - job_name: 'pso-analytics-monitor'
+        static_configs:
+        - targets: ['pso-analytics:9492']
+```
+
 Limitations:
 * Needs ability to LIST all pods in all namespaces in order to auto-discover PSO
 * Output is rigid and not easy to parse, query, or visualize
