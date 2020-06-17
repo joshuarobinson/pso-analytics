@@ -116,7 +116,6 @@ def collect_volumes():
     flashblades = purejson["FlashBlades"] if "FlashBlades" in purejson else {}
     flasharrays = purejson["FlashArrays"] if "FlashArrays" in purejson else {}
 
-
     # Begin collecting and correlating volume information from the backends.
     vols = []
 
@@ -142,6 +141,7 @@ def collect_volumes():
                 tags = {"all": "all",
                         "storageclass": pvc["storageclass"],
                         "namespace": pvc["namespace"],
+                        "name": pvc["name"],
                         "backend": "FA " + fajson["MgmtEndPoint"]}
                 if pvc["labels"]:
                     for l in pvc["labels"]:
@@ -182,6 +182,7 @@ def collect_volumes():
             tags = {"all": "all",
                     "storageclass": pvc["storageclass"],
                     "namespace": pvc["namespace"],
+                    "name": pvc["name"],
                     "backend": "FB " + fbjson["MgmtEndPoint"]}
             if pvc["labels"]:
                 for l in pvc["labels"]:

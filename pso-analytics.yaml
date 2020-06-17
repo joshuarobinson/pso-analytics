@@ -75,7 +75,7 @@ spec:
       serviceAccountName: pso-collect
       containers:
       - name: collect
-        image: joshuarobinson/pso-analytics:0.2
+        image: joshuarobinson/pso-analytics:0.3
         command: ["python"]
         args: ["collect_storage_info.py", "--prometheus", "--poll-seconds", "3600", "--output", "table"]
         imagePullPolicy: Always
